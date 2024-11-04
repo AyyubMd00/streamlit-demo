@@ -70,7 +70,7 @@ def main():
     if not data.empty:
         # KPIs
         total_trips = data['trip_id'].nunique()
-        total_revenue = data['fare'].sum()
+        total_revenue = int(data['fare'].sum())
         total_passengers = data['passenger_count'].sum()
         avg_waiting_time = data['passenger_wait_time'].mean()
         avg_trip_duration = data['trip_duration'].mean()
