@@ -91,7 +91,7 @@ def main():
             st.metric("Total Trips", total_trips)
             # st.metric("Total Drivers", total_drivers)
             st.metric("Total Passengers", total_passengers)
-            st.metric("Total Revenue", total_revenue)
+            st.metric("Total Revenue (INR)", total_revenue)
             st.metric("Total Trip Distance (km)", round(total_trip_distance, 2))
             st.metric("Avg. Trip Duration (mins)", round(avg_trip_duration, 2))
             st.metric("Avg. Waiting Time (mins)", round(avg_waiting_time, 2))
