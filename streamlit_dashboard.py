@@ -41,9 +41,13 @@ def fetch_data_from_snowflake(time_filter, region_filter):
         TIMESTAMPDIFF(minute, pickup_time, dropoff_time) AS trip_duration
     FROM taxi_trips
     WHERE pickup_time >= DATEADD({time_condition}, CURRENT_TIMESTAMP())
-    AND region in {region_filter}
     """
-    print(query)
+    if len(region_filter):
+        query += f"AND region in {region_filter}"
+    else:
+        query += f"AND 1=2" # to prevent fetching any data
+
+    # print(query)
     cursor.execute(query)
     rows = cursor.fetchall()
     
@@ -61,7 +65,12 @@ def main():
 
     # Filter options
     time_filter = st.selectbox("Select Time Range", ["30 mins", "1 hour", "1 day", "7 days"])
-    region_filter = tuple(st.multiselect("Select Region", ['North', 'South', 'East', 'West', 'Central']))
+    region_filter = st.multiselect("Select Region", ['North', 'South', 'East', 'West', 'Central'], default='North')
+    if len(region_filter)==1:
+        region_filter = "('"+str(region_filter[0])+"')"
+    else:
+        region_filter = tuple(region_filter)
+
     print(region_filter)
     # Fetch data
     data = fetch_data_from_snowflake(time_filter, region_filter)
@@ -119,7 +128,7 @@ def main():
             st.write(data)
 
     else:
-        st.write("No data available for the selected time range.")
+        st.write("No data available for this filter.")
 
 if __name__ == "__main__":
     main()
