@@ -41,9 +41,8 @@ def fetch_data_from_snowflake(time_filter, region_filter):
         TIMESTAMPDIFF(minute, pickup_time, dropoff_time) AS trip_duration
     FROM taxi_trips
     WHERE pickup_time >= DATEADD({time_condition}, CURRENT_TIMESTAMP())
+    AND region in {region_filter}
     """
-    if region_filter != 'All':
-        query += f" AND region = '{region_filter}'"
     print(query)
     cursor.execute(query)
     rows = cursor.fetchall()
@@ -62,8 +61,8 @@ def main():
 
     # Filter options
     time_filter = st.selectbox("Select Time Range", ["30 mins", "1 hour", "1 day", "7 days"])
-    region_filter = st.selectbox("Select Region", ['All', 'North', 'South', 'East', 'West', 'Central'])
-    print(time_filter)
+    region_filter = tuple(st.multiselect("Select Region", ['North', 'South', 'East', 'West', 'Central']))
+    print(region_filter)
     # Fetch data
     data = fetch_data_from_snowflake(time_filter, region_filter)
     print(data.head())
@@ -91,7 +90,7 @@ def main():
             st.metric("Total Trips", total_trips)
             # st.metric("Total Drivers", total_drivers)
             st.metric("Total Passengers", total_passengers)
-            st.metric("Total Revenue (INR)", total_revenue)
+            st.metric("Total Revenue", total_revenue)
             st.metric("Total Trip Distance (km)", round(total_trip_distance, 2))
             st.metric("Avg. Trip Duration (mins)", round(avg_trip_duration, 2))
             st.metric("Avg. Waiting Time (mins)", round(avg_waiting_time, 2))
